@@ -13,7 +13,7 @@ struct Bot;
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
         // List of words to delete
-        let forbidden_words = ["airdrop", "Airdrop", "AIRDROP"];
+        let forbidden_words = ["airdrop", "Airdrop", "AIRDROP", "ICO", "Token", "token", "Claim", "claim"];
 
         // Check if the message contains any of the forbidden words
         // and if the message is from a bot or a user
