@@ -19,7 +19,7 @@ impl EventHandler for Bot {
         // and if the message is from a bot or a user
         if forbidden_words.iter().any(|&word| msg.content.contains(word)) || msg.author.bot {
             // Wait for 5 seconds before deleting the message
-            sleep(Duration::from_secs(5)).await;
+            sleep(Duration::from_secs(3)).await;
 
             // Attempt to delete the message
             if let Err(e) = msg.delete(&ctx.http).await {
