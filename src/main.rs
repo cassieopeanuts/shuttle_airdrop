@@ -16,9 +16,8 @@ impl EventHandler for Bot {
         let forbidden_words = ["airdrop", "Airdrop", "AIRDROP", "ICO", "Token", "token", "Claim", "claim"];
 
         // Check if the message contains any of the forbidden words
-        // and if the message is from a bot or a user
-        if forbidden_words.iter().any(|&word| msg.content.contains(word)) || msg.author.bot {
-            // Wait for 5 seconds before deleting the message
+        if forbidden_words.iter().any(|&word| msg.content.contains(word)) {
+            // Wait for 3 seconds before deleting the message
             sleep(Duration::from_secs(3)).await;
 
             // Attempt to delete the message
