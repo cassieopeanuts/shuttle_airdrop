@@ -6,17 +6,24 @@ use serenity::prelude::*;
 use shuttle_secrets::SecretStore;
 use tracing::{error, info};
 use tokio::time::{sleep, Duration};
+use regex::Regex;
 
 struct Bot;
 
 #[async_trait]
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
-        // List of words to delete
-        let forbidden_words = ["airdrop", "Airdrop", "AIRDROP", "ICO", "Token", "token", "Claim", "claim"];
+        // List of words to delete (in lowercase for case-insensitive matching)
+        let forbidden_words = ["airdrop", "ico", "token", "claim"];
 
-        // Check if the message contains any of the forbidden words
-        if forbidden_words.iter().any(|&word| msg.content.contains(word)) {
+        // Construct a regex pattern to match forbidden words in various Markdown formats
+        let pattern = forbidden_words.iter().map(|&word| {
+            format!(r"(?i)\b(\*{{1,3}}|_{{1,3}})?{}(\*{{1,3}}|_{{1,3}})?\b", regex::escape(word))
+        }).collect::<Vec<_>>().join("|");
+        let regex = Regex::new(&pattern).unwrap();
+
+        // Check if the message contains any of the forbidden words in various formats
+        if regex.is_match(&msg.content) {
             // Wait for 3 seconds before deleting the message
             sleep(Duration::from_secs(3)).await;
 
