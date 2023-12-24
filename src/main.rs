@@ -29,10 +29,13 @@ impl EventHandler for Bot {
         let pattern = forbidden_words.iter().map(|&word| {
             let mut modified_word = word.to_string();
             for (english_char, replacement) in &replacement_map {
-                modified_word = modified_word.replace(*english_char, replacement);
+                modified_word = modified_word.chars().map(|c| {
+                    if c == *english_char { replacement.to_string() } else { c.to_string() }
+                }).collect();
             }
-            format!(r"(?i)(\*{{1,3}}|_{{1,3}})?{}(\*{{1,3}}|_{{1,3}})?", regex::escape(&modified_word))
+            format!(r"(?i)(\*{{1,3}}|_{{1,3}})?{}(\*{{1,3}}|_{{1,3}})?", modified_word)
         }).collect::<Vec<_>>().join("|");
+        
         let regex = Regex::new(&pattern).unwrap();
 
         // Normalize and check the message content
