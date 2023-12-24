@@ -25,3 +25,5 @@ Mind you that 0 idle timer in Shuttle.rs might be changed to premium feature in 
 Deploy with:
 
         cargo shuttle deploy --allow-dirty
+
+Check https://www.shuttle.rs/ for more info
