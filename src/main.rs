@@ -14,7 +14,7 @@ struct Bot;
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
         // List of words to delete (in lowercase for case-insensitive matching)
-        let forbidden_words = ["airdrop", "ico", "token", "claim", "airdr"];
+        let forbidden_words = ["airdrop", "ico", "token", "claim", "airdr", "irdr"];
 
         // Construct a regex pattern to match forbidden words in various Markdown formats
         let pattern = forbidden_words.iter().map(|&word| {
