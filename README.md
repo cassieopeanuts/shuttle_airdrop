@@ -26,4 +26,4 @@ Deploy with:
 
         cargo shuttle deploy --allow-dirty
 
-Check https://www.shuttle.rs/ for more info
+Check [Suttle.rs Serenity documentation](https://docs.shuttle.rs/examples/serenity) for more info
