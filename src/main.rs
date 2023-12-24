@@ -7,23 +7,39 @@ use shuttle_secrets::SecretStore;
 use tracing::{error, info};
 use tokio::time::{sleep, Duration};
 use regex::Regex;
+use std::collections::HashMap;
 
 struct Bot;
 
 #[async_trait]
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
-        // List of words to delete (in lowercase for case-insensitive matching)
         let forbidden_words = ["airdrop", "ico", "token", "claim", "airdr", "irdr"];
 
-        // Construct a regex pattern to match forbidden words in various Markdown formats
+        // Enhanced character replacement mapping
+        let mut replacement_map: HashMap<char, &str> = HashMap::new();
+        replacement_map.insert('a', "[aаAА@4]");
+        replacement_map.insert('i', "[i1!|IІі]");
+        replacement_map.insert('r', "[rRгГ]");
+        replacement_map.insert('d', "[dD]");
+        replacement_map.insert('o', "[oOоО0]");
+        // Add more mappings as needed
+
+        // Construct a regex pattern to match forbidden words within larger strings
         let pattern = forbidden_words.iter().map(|&word| {
-            format!(r"(?i)\b(\*{{1,3}}|_{{1,3}})?{}(\*{{1,3}}|_{{1,3}})?\b", regex::escape(word))
+            let mut modified_word = word.to_string();
+            for (english_char, replacement) in &replacement_map {
+                modified_word = modified_word.replace(*english_char, replacement);
+            }
+            format!(r"(?i)(\*{{1,3}}|_{{1,3}})?{}(\*{{1,3}}|_{{1,3}})?", regex::escape(&modified_word))
         }).collect::<Vec<_>>().join("|");
         let regex = Regex::new(&pattern).unwrap();
 
-        // Check if the message contains any of the forbidden words in various formats
-        if regex.is_match(&msg.content) {
+        // Normalize and check the message content
+        let normalized_content = unicode_normalization::UnicodeNormalization::nfc(msg.content.chars()).collect::<String>();
+        if regex.is_match(&normalized_content) {
+            // If a forbidden word is found in the message
+
             // Wait for 3 seconds before deleting the message
             sleep(Duration::from_secs(3)).await;
 
@@ -38,6 +54,7 @@ impl EventHandler for Bot {
         info!("{} is connected!", ready.user.name);
     }
 }
+
 
 #[shuttle_runtime::main]
 async fn serenity(
