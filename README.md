@@ -11,7 +11,6 @@ In order to run initiate shuttle serenity template with:
 
 cargo shuttle init --template serenity
 
-Add Secrets.toml to .gitignore
 In Secrets.toml add your discord bot private key
         DISCORD_TOKEN='your key'
 
