@@ -14,7 +14,7 @@ struct Bot;
 #[async_trait]
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
-        let forbidden_words = ["airdrop", "ico", "token", "claim", "giveaway"];
+        let forbidden_words = ["airdrop", "ico", "giveaway"];
 
         // Enhanced character replacement mapping
         let mut replacement_map: HashMap<char, &str> = HashMap::new();
