@@ -1,9 +1,15 @@
-use anyhow::anyhow;
-use serenity::async_trait;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::prelude::*;
-use shuttle_secrets::SecretStore;
+use anyhow::Context as _;
+use serenity::{
+    model::{channel::Message, gateway::Ready},
+    async_trait, 
+};
+
+use serenity::Client;
+use serenity::prelude::GatewayIntents;
+use serenity::client::Context;
+use serenity::client::EventHandler;
+
+use shuttle_runtime::SecretStore;
 use tracing::{error, info};
 use tokio::time::{sleep, Duration};
 use regex::Regex;
@@ -61,16 +67,12 @@ impl EventHandler for Bot {
 
 #[shuttle_runtime::main]
 async fn serenity(
-    #[shuttle_secrets::Secrets] secret_store: SecretStore,
+    #[shuttle_runtime::Secrets] secret_store: SecretStore,
 ) -> shuttle_serenity::ShuttleSerenity {
-    // Get the discord token set in `Secrets.toml`
-    let token = if let Some(token) = secret_store.get("DISCORD_TOKEN") {
-        token
-    } else {
-        return Err(anyhow!("'DISCORD_TOKEN' was not found").into());
-    };
-
-    // Set gateway intents, which decides what events the bot will be notified about
+    let token = secret_store
+        .get("DISCORD_TOKEN")
+        .context("'DISCORD_TOKEN' was not found")?;
+    
     let intents = GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
 
     let client = Client::builder(&token, intents)
@@ -78,5 +80,5 @@ async fn serenity(
         .await
         .expect("Err creating client");
 
-    Ok(client.into())
-}
+        Ok(client.into())
+    }
